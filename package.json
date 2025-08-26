@@ -5,7 +5,8 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-    "saveDB": "wrangler d1 execute nebula --file=./database/migrations/schema.sql"
+    "saveDB": "wrangler d1 execute nebula --file=./database/schema.sql",
+    "exec": "wrangler d1 execute nebula --command \"SELECT * FROM users;\""
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.1.0",
