@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "saveDB": "wrangler d1 execute nebula --file=./database/migrations/schema.sql"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.1.0",
@@ -12,7 +13,7 @@
     "worker-mailer": "^1.1.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250803.0",
+    "@cloudflare/workers-types": "^4.20250823.0",
     "wrangler": "^4.4.0"
   }
 }
