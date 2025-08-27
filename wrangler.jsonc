@@ -13,10 +13,20 @@
       "database_id": "c5cfdb7f-d649-4870-9430-db5b7a20771e"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "nebula"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "11e76822303b4ea4a8cec59495eb6e05",
+    }
+  ],
   "vars": {
     "JWT_SECRET": "xQ7$pL2@kR9*mZ4!sT6&fG8%hJ1#vB3^nM5",  // 请使用32位随机密钥来 增强 JWT 的安全性
-    "ACCESS_TOKEN_EXPIRY": "86400",  //  24 小时
-    "REFRESH_TOKEN_EXPIRY": "2592000"  //30 天 
   },
 
 }

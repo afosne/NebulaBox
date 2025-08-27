@@ -1,13 +1,15 @@
 import { Context } from "hono"
 import { getUserId, getUserInfo } from "../controllers/user"
-import { generateAccessToken, generateRefreshToken } from "../utils/token"
+import { Expiry, generateAccessToken, generateRefreshToken } from "../utils/token"
 import { verifyPassword } from "../utils/pass"
 
 interface LoginParams {
-    username?: string
+    username: string
     email?: string
     password: string
 }
+
+
 
 /**
  * 登录
@@ -16,16 +18,19 @@ interface LoginParams {
  * @returns
  */
 export async function login(c: Context, params: LoginParams) {
-    const { username, email, password } = params
-    const user = await getUserInfo(c, username, email)
-    
-    if (!user) {
-        return { susccess: false, message: '用户不存在' }
+    const username = params.username 
+    const userid = await getUserId(c, username)
+    if (!userid) {
+        return { success: false, message: '用户不存在' }  // 修复拼写错误: susccess -> success
     }
-    const userid = await getUserId(c, username, email)
     
-    // 验证密码是否在正确
-    const isPasswordValid = await verifyPassword(user.password, password);
+    // 获取用户信息，包括密码
+    const user = await getUserInfo(c, userid)
+    if (!user) {
+        return { success: false, message: '用户不存在' }
+    }
+    // 验证密码是否正确
+    const isPasswordValid = await verifyPassword(user.password, params.password);  // 修正变量名
     if (!isPasswordValid) {
         return { success: false, message: '密码错误' };
     }
@@ -34,13 +39,14 @@ export async function login(c: Context, params: LoginParams) {
     const accessToken = await generateAccessToken(
         userid,
         c.env.JWT_SECRET,
-        parseInt(c.env.ACCESS_TOKEN_EXPIRY) // 传入秒数
+        Expiry.AccessToken
     )
     // 生成刷新令牌
     const refreshToken = await generateRefreshToken(
         userid,
         c.env.JWT_SECRET,
-        parseInt(c.env.REFRESH_TOKEN_EXPIRY) // 传入秒数
+        Expiry.RefreshToken
     )
+
     return { success: true, id: userid, accessToken, refreshToken }
 }

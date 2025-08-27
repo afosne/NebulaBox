@@ -16,14 +16,17 @@ export async function register(c: Context, params: RegisterParams) {
         password: params.password,
         email: params.email,
     }
+    
     const user = await createUser(c, userParas)
     if (!user.success) {
         return { success: false, message: user.message }
     }
+
     const userId = await getUserId(c,  params.username)
     if (!userId) {
         return { success: false, message: '用户创建失败' }
     }
+
     const membership : Membership = {
         user_id: Number(userId),
         plan: MembershipPlan.Trial,

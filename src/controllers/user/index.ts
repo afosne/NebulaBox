@@ -1,140 +1,96 @@
+
 import { Context } from "hono"
 import { getD1Database } from "../../types/env"
 import { User } from "../../models/user"
 import { hashPassword } from "../../utils/pass";
 
-// 定义查询用户的参数类型
-type GetUserParams = {
-  id?: string;
-  username?: string;
-  email?: string;
-};
-
-// 定义函数返回类型
-type ServiceResponse<T = unknown> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  message: string;
-};
-
 /**
  * createUser 创建用户
  * @param c 
  * @param params 
- * @returns 创建的用户ID或错误信息
+ * @returns 创建的用户
  */
-export async function createUser(c: Context, params: User): Promise<ServiceResponse<{ id: number }>> { 
+export async function createUser(c: Context, params: User) { 
   try { 
     const db = getD1Database(c);
 
-    const avatar = params.avatar ?? `https://api.dicebear.com/9.x/pixel-art/svg?seed=${params.username}`;
-    const role = params.role ?? 'member';
+    const avatar = params.avatar ? params.avatar : `https://api.dicebear.com/9.x/pixel-art/svg?seed=${params.username}`;
+    const role = params.role ? params.role : 'member';
     const password = await hashPassword(params.password);
-    
-    const result = await db
+    const user = await db
         .prepare(`INSERT INTO users (username, password, email, avatar, role) VALUES (?, ?, ?, ?, ?)`)
         .bind(params.username, password, params.email, avatar, role)
         .run();
-
-    // 检查插入是否成功
-    if (result.success && result.meta?.last_row_id) {
-      console.log(`用户 ${params.username} 创建成功，ID: ${result.meta.last_row_id}`);
-      return {
-        success: true,
-        data: { id: result.meta.last_row_id }
-      };
-    }
-
-    throw new Error("用户创建失败");
+    console.log("用户" + params.username + "创建"+ user);
+    return user;
   } catch (error: any) { 
-    console.error("创建用户失败:", error);
-    
-    if (error.message.includes("UNIQUE constraint failed: users.email")) {
-      return { success: false, message: "用户邮箱已存在" };
-    } else if (error.message.includes("UNIQUE constraint failed: users.username")) {
-      return { success: false, message: "用户名已存在" };
-    }
-    
-    return { success: false, message: error.message || "创建用户时发生错误" };
+    console.error(error);
+      if (error.message.includes("UNIQUE constraint failed: users.email")) {
+            return {
+                success: false,
+                message: "用户邮箱已存在"
+            };
+      }else if (error.message.includes("UNIQUE constraint failed: users.username")) {
+            return {
+                success: false,
+                message: "用户名已存在"
+            };
+      }
+      return {
+        success: false,
+        message: error.message
+      };
   }
 }
 
 /**
  * 查询用户ID
  * @param c
- * @param username 或 email
+ * @param username
  * @returns 用户ID
  */
-export async function getUserId(c: Context, { username, email }: { username?: string; email?: string }): Promise<number | null> { 
-  if (!username && !email) {
-    console.error("getUserId 缺少必要参数");
-    return null;
-  }
-
-  try {
-    const db = getD1Database(c);
-    let user: { id: number } | null = null;
-
-    if (username) {    
-      user = await db
+export async function getUserId(c: Context, username: string ) { 
+    const db = getD1Database(c)
+  
+    const user = await db
         .prepare(`SELECT id FROM users WHERE username = ?`)
         .bind(username)
-        .first<{ id: number }>();
-      console.log(`用户 ${username} 查询结果:`, user);
-    } else if (email) {    
-      user = await db
-        .prepare(`SELECT id FROM users WHERE email = ?`)
-        .bind(email)
-        .first<{ id: number }>();
-      console.log(`用户 ${email} 查询结果:`, user);
-    }
+        .first();
 
-    return user?.id || null;
-  } catch (error) {
-    console.error("查询用户ID失败:", error);
-    return null;
-  }
+    console.log("用户" + username + "查询"+ user);
+    return Number(user?.id);
 }
 
 /**
- * 获取用户信息（不包含密码）
- * @param params 查询参数（id、username、email 三选一）
+ * 获取用户信息
+ * @param c
+ * @param 用户id 或者 用户名
  * @returns 用户信息
  */
-export async function getUserInfo(c: Context, params: GetUserParams): Promise<Omit<User, 'password'> | null> {
-  const { id, username, email } = params;
-  
-  if (!id && !username && !email) {
-    console.error("getUserInfo 缺少必要参数");
-    throw new Error("请传入必要的参数（id、username 或 email）");
+export async function getUserInfo(c: Context, id: number): Promise<User | null> {
+  // 1. 先校验用户 ID 合法性（原有逻辑保留）
+  if (!id || id <= 0) {
+    throw new Error('Invalid user ID: ID must be a positive number');
   }
 
   try {
     const db = getD1Database(c);
-    let user: any = null;
-
-    // 只查询需要的字段，排除密码
+    // 2. 只查询需要的字段（避免 SELECT * 泄露敏感信息）
     const query = `
-      SELECT id, username, email, avatar, role, created_at, updated_at 
+      SELECT id, username, password 
       FROM users 
-      WHERE 
-        ${id ? 'id = ?' : username ? 'username = ?' : 'email = ?'}
+      WHERE id = ?
     `;
+    // 3. 执行查询，通过 as User 断言结果类型（需确保 SQL 返回字段与 User 接口一致）
+    const user = await db.prepare(query)
+      .bind(id)
+      .first() as User | null; // 明确返回类型：User 或 null
 
-    if (id) {
-      user = await db.prepare(query).bind(id).first();
-    } else if (username) {
-      user = await db.prepare(query).bind(username).first();
-    } else if (email) {
-      user = await db.prepare(query).bind(email).first();
-    }
-
-    console.log("用户查询结果:", user);
-    return user as Omit<User, 'password'> | null;
+    console.log(`用户查询结果（ID: ${id}）:`, user);
+    return user;
   } catch (error) {
-    console.error("查询用户信息失败:", error);
-    throw error; // 抛出错误让调用方处理
+    // 4. 捕获数据库查询异常（如 SQL 语法错误、D1 连接失败）
+    console.error('查询用户信息失败:', error);
+    throw new Error('Failed to fetch user information');
   }
 }

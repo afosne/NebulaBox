@@ -7,7 +7,8 @@ import userRoutes from './routes/userRoutes';
 import filmRoutes from './routes/filmRoutes';
 import commentRoutes from './routes/commentRoutes';
 import cmsRoutes from './routes/cmsRoutes';
-import { authMiddleware } from './middlewares/auth';
+import tokenRoutes from './routes/tokenRoutes';
+
 
 const app = new Hono()
 app.use("*",cors())
@@ -21,6 +22,7 @@ app.route('/users', userRoutes)
 app.route('/films', filmRoutes)
 app.route('/comments', commentRoutes)
 app.route('/cms', cmsRoutes)
+app.route('/auth', tokenRoutes)
 
 
 export default app

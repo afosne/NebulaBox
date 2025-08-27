@@ -1,13 +1,19 @@
 import { sign } from 'hono/jwt'
 
+export enum Expiry{
+    AccessToken = 86400,
+    RefreshToken = 2592000
+}
+
 // 生成访问令牌（短期有效）
 export const generateAccessToken = async (
-  userId: string | number,
+  userId: number,
   secret: string,
-  expiresIn: number = 900 // 默认15分钟（秒）
+  expiresIn : number = Expiry.AccessToken
 ) => {
   // 计算过期时间（当前时间 + 有效期秒数）
-  const exp = Math.floor(Date.now() / 1000) + expiresIn;
+  const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+  const exp: number = currentTimeInSeconds + expiresIn;
   
   // 访问令牌 payload 包含必要的用户标识信息和过期时间
   return sign(
@@ -23,12 +29,13 @@ export const generateAccessToken = async (
 
 // 生成刷新令牌（长期有效）
 export const generateRefreshToken = async (
-  userId: string | number,
+  userId: number,
   secret: string,
-  expiresIn: number = 2592000 // 默认30天（秒）
+  expiresIn: number = Expiry.RefreshToken
 ) => {
   // 计算过期时间（当前时间 + 有效期秒数）
-  const exp = Math.floor(Date.now() / 1000) + expiresIn;
+  const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+  const exp: number = currentTimeInSeconds + expiresIn;
   
   // 刷新令牌 payload 应尽量精简
   return sign(

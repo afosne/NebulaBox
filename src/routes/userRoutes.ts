@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { register } from '../services/register'
-import { use } from 'hono/jsx'
 import { login } from '../services/login'
 
 const userRoutes = new Hono()

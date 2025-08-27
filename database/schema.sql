@@ -25,7 +25,7 @@ END;
 
 -- 初始化用户（避免重复插入）
 INSERT OR IGNORE INTO users (username, password, email, role) VALUES
-('admin', 'admin123', 'admin@example.com', 'admin'),
+('admin', 'f844cc5c825b76761fda3a4c6ad8127f:9ab4ea7d1c98b740502805e3f93c3350456242482c1d65e5fcc901199e1aa3bf', 'admin@example.com', 'admin'),--admin / admin123 管理员账户
 ('member1', 'member123', 'member1@example.com', 'member'),
 ('vip1', 'vip123', 'vip1@example.com', 'vip');
 
