@@ -222,8 +222,8 @@ INSERT OR IGNORE INTO danmu (name, url, status) VALUES
 -- 9️⃣ 会员时间表
 CREATE TABLE IF NOT EXISTS memberships (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,                 -- 关联用户
-    plan TEXT NOT NULL,                       -- 会员计划（如VIP月卡/年卡）
+    user_id INTEGER NOT NULL,                    -- 关联用户
+    plan INTEGER NOT NULL,                       -- // 0 免费 1 测试会员 2 月付会员 3 季付会员 4 年付会员
     status INTEGER DEFAULT 1 CHECK(status IN (0,1)), -- 0过期 1有效
     start_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- 开通时间
     end_at DATETIME,                          -- 到期时间
