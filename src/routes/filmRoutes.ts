@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
-import { Env } from '../types/env'
 
-const filmRoutes = new Hono<{ Bindings: Env }>()
+const filmRoutes = new Hono()
 
 
 export default filmRoutes

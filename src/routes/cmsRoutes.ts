@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
-import { Env } from '../types/env'
 
-const cmsRoutes = new Hono<{ Bindings: Env }>()
+const cmsRoutes = new Hono()
 
 export default cmsRoutes

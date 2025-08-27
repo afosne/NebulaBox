@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.1.0",
+    "@tidbcloud/serverless": "^0.2.0",
     "hono": "^4.8.12",
     "worker-mailer": "^1.1.4"
   },

@@ -11,9 +11,11 @@ import { authMiddleware } from './middlewares/auth';
 
 const app = new Hono()
 app.use("*",cors())
+app.use('*', loggerMiddleware)
+
 app.use(prettyJSON()) 
 app.use(logger());
-app.use('*', loggerMiddleware)
+
 
 app.route('/users', userRoutes)
 app.route('/films', filmRoutes)
