@@ -18,11 +18,11 @@ export async function register(c: Context, params: RegisterParams) {
     }
     const user = await createUser(c, userParas)
     if (!user.success) {
-        return { error: '用户创建失败', message: user.message , }
+        return { success: false, message: user.message }
     }
     const userId = await getUserId(c,  params.username)
     if (!userId) {
-        return { error: '用户创建失败' }
+        return { success: false, message: '用户创建失败' }
     }
     const membership : Membership = {
         user_id: Number(userId),
@@ -34,7 +34,7 @@ export async function register(c: Context, params: RegisterParams) {
 
     const result =  await createMembership(c, membership)
     if(!result.success){
-        return { error: '会员创建失败' }
+        return {success: false, message: '会员创建失败' }
     }
-    return { message: '会员创建成功' }
+    return {success: true, message: '会员创建成功'}
 }
