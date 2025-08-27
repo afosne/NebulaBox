@@ -52,3 +52,12 @@ export function getR2Bucket(c: Context, fallback?: R2Bucket): R2Bucket {
   }
   return r2
 }
+
+declare module "hono" {
+  interface ContextVariableMap {
+    jwtPayload: {
+      id: number
+      type: string
+    }
+  }
+}
