@@ -4,7 +4,7 @@ import { User } from "../models/user"
 import { Membership } from "../models/memberships"
 import { createMembership, getEndTime, MembershipPlan, MembershipStatus } from "../controllers/memberships"
 
-export interface RegisterParams {
+interface RegisterParams {
   username: string
   password: string
   email: string
