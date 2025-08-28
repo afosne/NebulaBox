@@ -3,6 +3,7 @@ import { Context } from "hono"
 import { getD1Database } from "../../types/env"
 import { User } from "../../models/user"
 import { hashPassword } from "../../utils/pass";
+import { ChangePasswordParams } from "../../services/user/changePassword";
 
 /**
  * createUser 创建用户
@@ -92,5 +93,28 @@ export async function getUserInfo(c: Context, id: number): Promise<User | null> 
     // 4. 捕获数据库查询异常（如 SQL 语法错误、D1 连接失败）
     console.error('查询用户信息失败:', error);
     throw new Error('Failed to fetch user information');
+  }
+}
+
+/**
+ * 更新用户密码
+ * @param c
+ * @param username 用户名
+ * @param oldPassword 旧密码
+ * @param newPassword 新密码
+ */
+export async function updateUserPassword(c: Context, params:ChangePasswordParams) { 
+  try { 
+    const db = getD1Database(c);
+    const password = await hashPassword(params.newPassword);
+    const user = await db
+        .prepare(`UPDATE users SET password = ? WHERE username = ?`)
+        .bind(password, params.username)
+        .run();
+    console.log("用户" + params.username + "更新密码"+ user);
+    return user
+  } catch (error: any) { 
+    console.error(error);
+    throw new Error('Failed to update user password');
   }
 }

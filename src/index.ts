@@ -4,7 +4,7 @@ import { prettyJSON } from 'hono/pretty-json'
 import { cors } from 'hono/cors';
 import { loggerMiddleware } from './middlewares/logger';
 import userRoutes from './routes/userRoutes';
-import filmRoutes from './routes/filmRoutes';
+import filmRoutes from './routes/filmsRoutes';
 import commentRoutes from './routes/commentRoutes';
 import cmsRoutes from './routes/cmsRoutes';
 import tokenRoutes from './routes/tokenRoutes';
@@ -20,10 +20,12 @@ app.use(logger());
 
 
 app.route('/users', userRoutes)
-app.route('/films', filmRoutes)
-app.route('/comments', commentRoutes)
-app.route('/cms', cmsRoutes)
 app.route('/auth', tokenRoutes)
+
+app.route('/films', filmRoutes)  // 相当于 跳转到详情页面
+app.route('/comments', commentRoutes) //评论
+app.route('/cms', cmsRoutes) //cms 管理 操作
+
 
 
 export default app

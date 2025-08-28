@@ -2,18 +2,13 @@
 import { Hono } from 'hono'
 
 import { authRefreshMiddleware } from '../middlewares/auth';
+import { refreshToken } from '../services/auth/refreshToken';
 
 const tokenRoutes = new Hono()
 
-tokenRoutes.get('/refresh', authRefreshMiddleware, async c => {
-  const payload = c.get('jwtPayload')
-  const userId = payload.id  
-
-  return c.json({
-    code: 200,
-    msg: 'refresh token 有效',
-    userId
-  })
+tokenRoutes.get('/refresh', authRefreshMiddleware, async (c)=> {
+  const result = await refreshToken(c)
+  return c.json(result)
 })
 
 

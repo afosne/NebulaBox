@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 用户更新时间触发器（SQLite 兼容语法）
+-- 用户更新时间触发器
 CREATE TRIGGER IF NOT EXISTS users_update_timestamp
 AFTER UPDATE ON users
 FOR EACH ROW
@@ -23,12 +23,10 @@ BEGIN
     UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
 END;
 
--- 初始化用户（避免重复插入）
+-- 初始化用户
 INSERT OR IGNORE INTO users (username, password, email, role) VALUES
-('admin', 'f844cc5c825b76761fda3a4c6ad8127f:9ab4ea7d1c98b740502805e3f93c3350456242482c1d65e5fcc901199e1aa3bf', 'admin@example.com', 'admin'),--admin / admin123 管理员账户
-('member1', 'member123', 'member1@example.com', 'member'),
-('vip1', 'vip123', 'vip1@example.com', 'vip');
-
+('admin', 'f844cc5c825b76761fda3a4c6ad8127f:9ab4ea7d1c98b740502805e3f93c3350456242482c1d65e5fcc901199e1aa3bf', 'admin@example.com', 'admin'), -- admin / admin123 管理员账户
+('user', 'f844cc5c825b76761fda3a4c6ad8127f:9ab4ea7d1c98b740502805e3f93c3350456242482c1d65e5fcc901199e1aa3bf', 'member@example.com', 'member'); 
 -- ==========================
 -- 2️⃣ 分类表
 CREATE TABLE IF NOT EXISTS categories (
@@ -58,6 +56,7 @@ INSERT OR IGNORE INTO categories (name) VALUES
 CREATE TABLE IF NOT EXISTS films (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
+    episode INTEGER, -- 集数：电影默认为0，连续剧填写实际集数
     web INTEGER DEFAULT 0, -- 0未知 1爱奇艺 2腾讯 3优酷 4芒果
     category_id INTEGER,
     cover_url TEXT,
@@ -76,15 +75,14 @@ BEGIN
     UPDATE films SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
 END;
 
--- 索引优化（按分类查询影片）
+-- 索引优化
 CREATE INDEX IF NOT EXISTS idx_films_category_id ON films(category_id);
 
--- 初始化影片
-INSERT OR IGNORE INTO films (title, web, category_id, cover_url, description, source_url) VALUES
-('哪吒', 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://www.iqiyi.com/v_19rrcuke28.html?vid=6a3e3134537a9500250fca3c6c72089d089d&ischarge=true&vtype=0&ht=2&lt=2&s2=3&s3=pca_115_episode_new&s4=0'),
-('哪吒', 2, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://v.qq.com/x/cover/mzc00200tjkzeps/y4101qnn3jo.html'),
-('哪吒', 3, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://www.mgtv.com/b/713367/23281587.html?fpa=se&lastp=so_result'),
-('哪吒', 4, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://v.youku.com/v_show/id_XNjQ4NTM3ODA4OA==.html?spm=a2hkm.8166622.PhoneSokuProgram_1.dposter&s=cdee9099d49b4137918b');
+-- 初始化影片（修复了多余的逗号）
+INSERT OR IGNORE INTO films (title, episode, web, category_id, cover_url, description, source_url) VALUES
+('哪吒之魔童闹海', 0, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://www.iqiyi.com/v_19rrcuke28.html'),
+('子夜归', 1, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/z4101m43ng6.html'),
+('子夜归', 2, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/x410101njeh.html');
 
 -- ==========================
 -- 4️⃣ 轮播图表
@@ -107,7 +105,7 @@ END;
 
 -- 初始化轮播图
 INSERT OR IGNORE INTO banners (title, image_url, link) VALUES
-('哪吒', 'https://1vimg.hitv.com/100/2508/0117/4410/V2HsGwNr/452890254000508928.jpg', '/films/1');
+('哪吒之魔童闹海', 'https://1vimg.hitv.com/100/2508/0117/4410/V2HsGwNr/452890254000508928.jpg', '/films/1');
 
 -- ==========================
 -- 5️⃣ 评论表
@@ -132,16 +130,16 @@ BEGIN
     UPDATE comments SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
 END;
 
--- 索引优化（按影片/用户查询评论）
+-- 索引优化
 CREATE INDEX IF NOT EXISTS idx_comments_film_id ON comments(film_id);
 CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
 
 -- 初始化评论
 INSERT OR IGNORE INTO comments (film_id, user_id, content) VALUES
-(1, 2, '测试评论 1'),
-(2, 3, '测试评论 2'),
+(1, 1, '测试评论 1'),
+(2, 2, '测试评论 2'),
 (3, 2, '电视剧评论 1'),
-(3, 3, '动漫评论 1');
+(3, 2, '动漫评论 1');
 
 -- ==========================
 -- 6️⃣ 影视采集 CMS 表
@@ -223,7 +221,7 @@ INSERT OR IGNORE INTO danmu (name, url, status) VALUES
 CREATE TABLE IF NOT EXISTS memberships (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,                    -- 关联用户
-    plan INTEGER NOT NULL,                       -- // 0 免费 1 测试会员 2 月付会员 3 季付会员 4 年付会员
+    plan INTEGER NOT NULL,                       -- 0免费 1测试会员 2月付会员 3季付会员 4年付会员
     status INTEGER DEFAULT 1 CHECK(status IN (0,1)), -- 0过期 1有效
     start_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- 开通时间
     end_at DATETIME,                          -- 到期时间
@@ -233,7 +231,7 @@ CREATE TABLE IF NOT EXISTS memberships (
     UNIQUE(user_id, plan)                     -- 同一用户同一计划不重复
 );
 
--- 会员表更新时间触发器（修复 SET 语法，用 UPDATE 直接更新）
+-- 会员表更新时间触发器
 CREATE TRIGGER IF NOT EXISTS memberships_update_timestamp
 AFTER UPDATE ON memberships
 FOR EACH ROW
@@ -254,7 +252,7 @@ CREATE TABLE IF NOT EXISTS favorites (
     UNIQUE(user_id, film_id)                 -- 避免重复收藏
 );
 
--- 收藏表更新时间触发器（修复 SET 语法）
+-- 收藏表更新时间触发器
 CREATE TRIGGER IF NOT EXISTS favorites_update_timestamp
 AFTER UPDATE ON favorites
 FOR EACH ROW
@@ -262,6 +260,6 @@ BEGIN
     UPDATE favorites SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
 END;
 
--- 索引优化（按用户/影片查询收藏）
+-- 索引优化
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_film_id ON favorites(film_id);

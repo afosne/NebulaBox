@@ -1,8 +1,9 @@
 import { Context } from "hono"
-import { createUser, getUserId } from "../controllers/user"
-import { User } from "../models/user"
-import { Membership } from "../models/memberships"
-import { createMembership, getEndTime, MembershipPlan, MembershipStatus } from "../controllers/memberships"
+import { User } from "../../models/user"
+import { createUser, getUserId } from "../../controllers/user"
+import { Membership } from "../../models/memberships"
+import { createMembership, getEndTime, MembershipPlan, MembershipStatus } from "../../controllers/memberships"
+
 
 interface RegisterParams {
   username: string
