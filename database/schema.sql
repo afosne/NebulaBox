@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS films (
     category_id INTEGER,
     cover_url TEXT,
     description TEXT,
-    source_url TEXT NOT NULL UNIQUE,
+    source_url TEXT NOT NULL UNIQUE, -- TODO 待修改 不应该存在films 表 应该单独 存在资源表中
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id)

@@ -27,8 +27,10 @@ const appleCMSApiUrl = "http://zy.jinchancaiji.com/api.php/provide/vod"
 //     return { success: true, data: film }
 // }
 
+
 /**
  * 按影片名称查询详情（本地数据库优先，无则调用CMS并插入数据）
+ * TODO 待修改 逻辑实现成功 但是代码不规范
  * @param c - Hono上下文（包含数据库连接和环境变量）
  * @param name - 影片名称（支持中文）
  * @returns 标准化响应：{ success: boolean, data?: any[], msg?: string }
