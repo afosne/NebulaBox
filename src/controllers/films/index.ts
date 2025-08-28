@@ -22,7 +22,7 @@ export async function getFilmDetailByName(c: Context, name: string, web?: number
     const db = getD1Database(c);
     let film;
     
-    if (web === undefined) {
+    if (web === undefined|| !web) {
         film = await db
             .prepare(`SELECT * FROM films WHERE title LIKE ?`)
             .bind(`%${name}%`)
@@ -38,3 +38,18 @@ export async function getFilmDetailByName(c: Context, name: string, web?: number
         return film.results;
     }
 }
+
+//  const insertResult = await c.env.DB.prepare(
+            //   `INSERT INTO films (title, episode, web, category_id, cover_url, description, source_url, created_at, updated_at)
+            //    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            // ).bind(
+            //   filmInsertData.title,
+            //   filmInsertData.episode,
+            //   filmInsertData.web,
+            //   filmInsertData.category_id,
+            //   filmInsertData.cover_url,
+            //   filmInsertData.description,
+            //   filmInsertData.source_url,
+            //   filmInsertData.created_at,
+            //   filmInsertData.updated_at
+            // ).run();

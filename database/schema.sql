@@ -81,8 +81,8 @@ CREATE INDEX IF NOT EXISTS idx_films_category_id ON films(category_id);
 -- 初始化影片（修复了多余的逗号）
 INSERT OR IGNORE INTO films (title, episode, web, category_id, cover_url, description, source_url) VALUES
 ('哪吒之魔童闹海', 0, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://www.iqiyi.com/v_19rrcuke28.html'),
-('子夜归', 1, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/z4101m43ng6.html'),
-('子夜归', 2, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/x410101njeh.html');
+('子夜归', 1, 2, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/z4101m43ng6.html'),
+('子夜归', 2, 2, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/x410101njeh.html');
 
 -- ==========================
 -- 4️⃣ 轮播图表
