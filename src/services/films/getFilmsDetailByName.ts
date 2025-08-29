@@ -8,6 +8,9 @@ import { insertResources } from "../../controllers/resources";
 
 const appleCMSApiUrl = "http://zy.jinchancaiji.com/api.php/provide/vod"
 
+// 标准化返回
+
+
 /**
  * 按影片名称查询详情（本地数据库优先，无则调用CMS并插入数据）
  * TODO 待修改 逻辑实现成功 但是代码不规范
@@ -18,7 +21,6 @@ const appleCMSApiUrl = "http://zy.jinchancaiji.com/api.php/provide/vod"
 export async function getFilmsDetailByName(c: Context, name: string) {
   try {
 
-    const db = getD1Database(c);
     // 步骤1：查询本地数据库
     const localFilms = await getFilmDetailByName(c, name);
     if (localFilms && localFilms.length > 0) {
@@ -30,7 +32,7 @@ export async function getFilmsDetailByName(c: Context, name: string) {
       ac: "detail",
       wd: name
     });
-    
+
     if (!cmsResponse?.list || cmsResponse.list.length === 0) {
       return { success: false, message: "CMS未返回数据" };
     }
@@ -51,6 +53,7 @@ export async function getFilmsDetailByName(c: Context, name: string) {
         for (const ep of episodes) {
           const filmInsert: FilmInsertData = {
             ...baseData,
+            class: filmData.type_name,
             episode: ep.episode,
             source_url: ep.source_url,
             web: ep.web
@@ -58,11 +61,22 @@ export async function getFilmsDetailByName(c: Context, name: string) {
           // 插入 films
           const filmRes = await insertFilm(c, filmInsert)
 
-          const filmId =  filmRes.meta.last_row_id;
+          const filmId = filmRes.meta.last_row_id;
 
-          await insertResources(c, filmId, ep.source_url, ep.web, 1 ,currentTime, currentTime)
-          
-          resultFilms.push({ ...filmInsert, id: filmId });
+          await insertResources(c, filmId, ep.source_url, ep.web, 1, currentTime, currentTime)
+          const pushFilm = {
+            id: filmId,
+            title: filmInsert.title,
+            episode: filmInsert.episode,
+            category_id: filmInsert.category_id,
+            class: filmInsert.class,
+            cover_url: filmInsert.cover_url,
+            description: filmInsert.description,
+            created_at: filmInsert.created_at,
+            updated_at: filmInsert.updated_at
+          }
+
+          resultFilms.push({ ...pushFilm });
         }
       } else {
         // 电影或没有拆分的单集
@@ -73,19 +87,32 @@ export async function getFilmsDetailByName(c: Context, name: string) {
           web: matchWebType(filmData.vod_play_from || "")
         };
 
-
-
         const filmRes = await insertFilm(c, filmInsert)
 
         const filmId = filmRes.meta.last_row_id;
 
-        await insertResources(c, filmId, filmInsert.source_url, filmInsert.web, 1 ,currentTime, currentTime)
+        await insertResources(c, filmId, filmInsert.source_url, filmInsert.web, 1, currentTime, currentTime)
 
-        resultFilms.push({ ...filmInsert, id: filmId });
+
+        // 应该和  await getFilmDetailByName(c, name); 中的数据结构一致
+        const pushFilm = {
+          id: filmId,
+          title: filmInsert.title,
+          episode: filmInsert.episode,
+          category_id: filmInsert.category_id,
+          class: filmInsert.class,
+          cover_url: filmInsert.cover_url,
+          description: filmInsert.description,
+          created_at: filmInsert.created_at,
+          updated_at: filmInsert.updated_at
+        }
+
+        resultFilms.push({ ...pushFilm });
       }
     }
 
     console.log(`[CMS写入完成] 共写入${resultFilms.length}条影片数据`);
+
     return { success: true, data: resultFilms };
   } catch (error) {
     console.error("[影片获取/写入出错]", error);

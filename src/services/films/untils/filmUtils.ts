@@ -42,6 +42,7 @@ export interface FilmInsertData {
   episode: number | null;
   web: number;
   category_id: number | null;
+  class: string;
   cover_url: string;
   description: string;
   source_url: string;
@@ -53,7 +54,7 @@ export interface FilmInsertData {
 /**
  * 匹配播放源到films表的web字段
  */
-export function matchWebType(playFrom: string ): number {
+export function matchWebType(playFrom: string = "", url: string = ""): number {
   const webMap: WebMapType = {
     qiyi: 1,
     qq: 2,
@@ -62,9 +63,24 @@ export function matchWebType(playFrom: string ): number {
     bilibili: 5,
     default: 0
   };
-  return webMap[playFrom.toLowerCase()] ?? webMap.default;
-}
 
+  // 1️⃣ 优先直接用 playFrom
+  if (playFrom) {
+    const key = playFrom.toLowerCase();
+    if (webMap[key] !== undefined) {
+      return webMap[key];
+    }
+  }
+
+  // 2️⃣ 如果 playFrom 未知，则从 URL 中匹配
+  if (url.includes("iqiyi.com")) return webMap.qiyi;
+  if (url.includes("v.qq.com")) return webMap.qq;
+  if (url.includes("youku.com")) return webMap.youku;
+  if (url.includes("mgtv.com")) return webMap.mgtv;
+  if (url.includes("bilibili.com")) return webMap.bilibili;
+
+  return webMap.default;
+}
 /**
  * 从CMS数据中提取集数
  */
@@ -91,7 +107,6 @@ export function extractEpisode(filmData: AppleCMSFilmData): number | null {
  */
 export function splitPlayUrls(playUrl: string = "", playFrom: string = ""): EpisodeData[] {
   if (!playUrl) return [];
-  const web = matchWebType(playFrom);
 
   return playUrl.split("#").map((item, index) => {
     const [episodeStr, rawUrl] = item.split("$");
@@ -102,10 +117,11 @@ export function splitPlayUrls(playUrl: string = "", playFrom: string = ""): Epis
     const match = episodeStr.match(/(\d+)/);
     const episode = match ? Number(match[1]) : index + 1;
 
+    const web = matchWebType(playFrom, source_url);
+
     return { episode, source_url, web };
   }).filter((e): e is EpisodeData => e !== null);
 }
-
 /**
  * 提取影片基础数据（所有集共用的字段）
  */
