@@ -141,6 +141,7 @@ export function extractBaseFilmData(
   return {
     title: vod_name || "未知标题",
     category_id: categoryMap[type_name ?? ""] ?? null,
+    class: type_name || "未知",
     cover_url: vod_pic || vod_pic_thumb || "",
     description: vod_blurb || vod_content || "暂无简介",
     created_at: currentTime,
