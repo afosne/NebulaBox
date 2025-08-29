@@ -57,11 +57,10 @@ CREATE TABLE IF NOT EXISTS films (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     episode INTEGER, -- 集数：电影默认为0，连续剧填写实际集数
-    web INTEGER DEFAULT 0, -- 0未知 1爱奇艺 2腾讯 3优酷 4芒果
     category_id INTEGER,
+    class TEXT NOT NULL,            -- 标签 
     cover_url TEXT,
     description TEXT,
-    source_url TEXT NOT NULL UNIQUE, -- TODO 待修改 不应该存在films 表 应该单独 存在资源表中
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id)
@@ -79,10 +78,10 @@ END;
 CREATE INDEX IF NOT EXISTS idx_films_category_id ON films(category_id);
 
 -- 初始化影片（修复了多余的逗号）
-INSERT OR IGNORE INTO films (title, episode, web, category_id, cover_url, description, source_url) VALUES
-('哪吒之魔童闹海', 0, 1, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...', 'https://www.iqiyi.com/v_19rrcuke28.html'),
-('子夜归', 1, 2, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/z4101m43ng6.html'),
-('子夜归', 2, 2, 1, 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。', 'https://v.qq.com/x/cover/mzc002009y0nzq8/x410101njeh.html');
+INSERT OR IGNORE INTO films (title, episode, category_id, class , cover_url, description) VALUES
+('哪吒之魔童闹海', 0, 1, '动漫', 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc00200tjkzeps1733816869241', '天劫之后，哪吒、敖丙的灵魂虽保住了，但肉身很快会魂飞魄散...'),
+('子夜归', 1, 1, '电视', 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。'),
+('子夜归', 2, 1, '电视', 'https://vcover-vt-pic.puui.qpic.cn/vcover_vt_pic/0/mzc002009y0nzq81754897057518/350', '长安之下，别有玄机，隐秘儿女，子夜方归。孤傲郎君与纨绔贵女纵享双面人生，白日爱侣欢乐，夜里殊死相搏，只为护一方太平，佑海晏河清。');
 
 -- ==========================
 -- 4️⃣ 轮播图表
@@ -263,3 +262,17 @@ END;
 -- 索引优化
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_film_id ON favorites(film_id);
+
+-- ==========================
+-- 1️⃣1️⃣ 影片资源表 
+CREATE TABLE IF NOT EXISTS resources (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    film_id INTEGER NOT NULL,       -- 关联影片表（非 NULL，确保资源归属）
+    resource_url TEXT NOT NULL,     -- 播放链接
+    web INTEGER NOT NULL DEFAULT 0 CHECK(web IN (0,1,2,3,4)),  -- 平台枚举（0=未知，1=爱奇艺，2=腾讯，3=优酷，4=芒果 ,5=哔哩哔哩 ）
+    status INTEGER NOT NULL DEFAULT 1 CHECK(status IN (0,1)),  -- 状态（0=下线，1=启用）
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,  -- 影片删除时，关联资源自动删除（避免孤儿数据）
+    UNIQUE(resource_url)            -- 播放链接唯一，避免重复
+);

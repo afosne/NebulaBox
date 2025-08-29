@@ -1,5 +1,5 @@
 export interface Membership {
-  id?: number
+  id: number
   user_id: number
   plan: number // 0 免费 1 测试会员 2 月付会员 3 季付会员 4 年付会员
   status: number // 0过期 1有效

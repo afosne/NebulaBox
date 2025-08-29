@@ -2,7 +2,7 @@
 import { Context } from "hono"
 import { getD1Database } from "../../types/env"
 import { User } from "../../models/user"
-import { hashPassword } from "../../utils/pass";
+import { hashPassword } from "../../utils/passwd";
 import { ChangePasswordParams } from "../../services/user/changePassword";
 
 /**

@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { getUserId, getUserInfo, updateUserPassword } from "../../controllers/user";
-import { verifyPassword } from "../../utils/pass";
+import { verifyPassword } from "../../utils/passwd";
 
 
 export interface ChangePasswordParams {

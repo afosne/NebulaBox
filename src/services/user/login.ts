@@ -1,7 +1,7 @@
 import { Context } from "hono"
 import { getUserId, getUserInfo } from "../../controllers/user"
 import { Expiry, generateAccessToken, generateRefreshToken } from "../../utils/token"
-import { verifyPassword } from "../../utils/pass"
+import { verifyPassword } from "../../utils/passwd"
 
 interface LoginParams {
     username: string
