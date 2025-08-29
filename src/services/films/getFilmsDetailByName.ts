@@ -2,12 +2,13 @@ import { Context } from "hono";
 import { getFilmDetailByName, insertFilm } from "../../controllers/films";
 import { fetchAppleCMSData } from "../../api/cms/apple/fetchAppleCMSData";
 import { EpisodeData, extractBaseFilmData, extractEpisode, FilmInsertData, matchWebType, splitPlayUrls } from "./untils/filmUtils";
-import { getD1Database } from "../../types/env";
 import { insertResources } from "../../controllers/resources";
 
 
 const appleCMSApiUrl = "http://zy.jinchancaiji.com/api.php/provide/vod"
-
+// https://gctf.tfdh.top/api.php/provide/vod/?ac=list
+// https://cj.huohua.vip/api.php/provide/vod/?ac=list
+// https://www.caiji.cyou/api.php/provide/vod?ac=list
 // 标准化返回
 
 

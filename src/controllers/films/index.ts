@@ -6,7 +6,7 @@
 
 import { Context } from "hono";
 import { getD1Database } from "../../types/env";
-import { Film } from "../../models/films";
+
 
 
 export async function getFilmDetail(c: Context, id: number) {
