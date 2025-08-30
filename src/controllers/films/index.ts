@@ -8,7 +8,6 @@ import { Context } from "hono";
 import { getD1Database } from "../../types/env";
 
 
-
 export async function getFilmDetail(c: Context, id: number) {
     const db = getD1Database(c)
     const film = await db
@@ -28,6 +27,7 @@ export async function getFilmDetailByName(c: Context, name: string) {
         console.log("未定义web查询:", film.results);
         return film.results;
 }
+
 
 //插入影片数据
 export async function insertFilm(c: Context, film: any) {

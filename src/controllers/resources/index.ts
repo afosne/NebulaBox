@@ -15,3 +15,13 @@ export async function insertResources(c: Context, film_id: number, resource_url:
     return result
 }
 
+//更具id获取
+export async function getResourcesById(c: Context, id: number) {
+    const db = getD1Database(c)
+    const result = await db
+        .prepare(`SELECT * FROM resources WHERE id = ?`)
+        .bind(id)
+        .run()
+    console.log("资源获取:", id , result)
+    return result
+}

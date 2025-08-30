@@ -8,6 +8,7 @@ import filmRoutes from './routes/filmsRoutes';
 import commentRoutes from './routes/commentRoutes';
 import cmsRoutes from './routes/cmsRoutes';
 import tokenRoutes from './routes/tokenRoutes';
+import parsersRoutes from './routes/parsersRoutes';
 
 
 
@@ -21,8 +22,9 @@ app.use(logger());
 
 app.route('/users', userRoutes)
 app.route('/auth', tokenRoutes)
-
 app.route('/films', filmRoutes)  // 相当于 跳转到详情页面
+
+app.route('/parsers', parsersRoutes) //解析
 app.route('/comments', commentRoutes) //评论
 app.route('/cms', cmsRoutes) //cms 管理 操作
 
